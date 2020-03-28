@@ -1,31 +1,53 @@
 import React from 'react';
-import { View, Text, Image, StyleSheet, Button } from 'react-native';
+import {
+  View,
+  Text,
+  Image,
+  StyleSheet,
+  Button,
+  TouchableOpacity,
+  TouchableNativeFeedback, // for Android ripple effect
+  Platform
+} from 'react-native';
 
 import Colors from '../../constants/Colors';
 
 const ProductItem = props => {
+  let TouchableComp = TouchableOpacity;
+
+  if (Platform.OS === 'android' && Platform.Version >= 21) {
+    TouchableComp = TouchableNativeFeedback;
+  }
+
   return (
     <View style={styles.product}>
-      <View style={styles.imageContainer}>
-        <Image style={styles.image} source={{ uri: props.image }} />
+    <View style={styles.touchable}>
+    { // useForeground - ripple effect placed on all elements in the foreground }
+      <TouchableComp onPress={props.onViewDetail} useForeground>
+      <View>
+        <View style={styles.imageContainer}>
+          <Image style={styles.image} source={{ uri: props.image }} />
+        </View>
+        <View style={styles.details}>
+          <Text style={styles.title}>{props.title}</Text>
+          <Text style={styles.price}>${props.price.toFixed(2)}</Text>
+        </View>
+        <View style={styles.actions}>
+          <Button
+            color={Colors.primary}
+            title='View Details'
+            onPress={props.onViewDetail}
+          />
+          <Button
+            color={Colors.primary}
+            title='To Cart'
+            onPress={props.onAddToCart}
+          />
+        </View>
+        </View>
+        </TouchableComp>
+        </View>
       </View>
-      <View style={styles.details}>
-        <Text style={styles.title}>{props.title}</Text>
-        <Text style={styles.price}>${props.price.toFixed(2)}</Text>
-      </View>
-      <View style={styles.actions}>
-        <Button
-          color={Colors.primary}
-          title='View Details'
-          onPress={props.onViewDetail}
-        />
-        <Button
-          color={Colors.primary}
-          title='To Cart'
-          onPress={props.onAddToCart}
-        />
-      </View>
-    </View>
   );
 };
 
@@ -36,10 +58,13 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowRadius: 8,
     elevation: 5,
-    borderRadius: 10,
     backgroundColor: 'white',
     height: 300,
-    margin: 20
+    margin: 20,
+  },
+  touchable: {
+    overflow: 'hidden',
+    borderRadius: 10,
   },
   imageContainer: {
     width: '100%',
@@ -58,10 +83,12 @@ const styles = StyleSheet.create({
     padding: 10
   },
   title: {
+    fontFamily: 'open-sans-bold',
     fontSize: 18,
-    marginVertical: 4
+    marginVertical: 2
   },
   price: {
+    fontFamily: 'open-sans',
     fontSize: 14,
     color: '#888'
   },
